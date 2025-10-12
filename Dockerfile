@@ -1,4 +1,6 @@
-FROM ubuntu:22.04
+FROM nvidia/cuda:12.9.1-cudnn-devel-ubuntu22.04
+
+ENV DEBIAN_FRONTEND=noninteractive
 
 # create node user and group
 RUN groupadd --gid 1000 node \
@@ -18,6 +20,7 @@ RUN ARCH= OPENSSL_ARCH= && dpkgArch="$(dpkg --print-architecture)" \
       *) echo "unsupported architecture"; exit 1 ;; \
     esac \
     && set -ex \
+	&& savedAptMark="$(apt-mark showmanual)" \
     # libatomic1 for arm
     && apt-get update && apt-get install -y ca-certificates curl wget gnupg dirmngr xz-utils libatomic1 --no-install-recommends \
     && rm -rf /var/lib/apt/lists/* \
@@ -48,6 +51,7 @@ RUN ARCH= OPENSSL_ARCH= && dpkgArch="$(dpkg --print-architecture)" \
     # Remove unused OpenSSL headers to save ~34MB. See this NodeJS issue: https://github.com/nodejs/node/issues/46451
     && find /usr/local/include/node/openssl/archs -mindepth 1 -maxdepth 1 ! -name "$OPENSSL_ARCH" -exec rm -rf {} \; \
     && apt-mark auto '.*' > /dev/null \
+  	&& { [ -z "$savedAptMark" ] || apt-mark manual $savedAptMark > /dev/null; } \
     && find /usr/local -type f -executable -exec ldd '{}' ';' \
       | awk '/=>/ { so = $(NF-1); if (index(so, "/usr/local/") == 1) { next }; gsub("^/(usr/)?", "", so); print so }' \
       | sort -u \
@@ -101,7 +105,7 @@ RUN set -ex \
   && yarn --version \
   && rm -rf /tmp/*
 
-  
+
 # ensure local python is preferred over distribution python
 ENV PATH /usr/local/bin:$PATH
 
@@ -116,8 +120,8 @@ RUN set -eux; \
 	rm -rf /var/lib/apt/lists/*
 
 ENV GPG_KEY 7169605F62C751356D054A26A821E680E5FA6305
-ENV PYTHON_VERSION 3.13.8
-ENV PYTHON_SHA256 b9910730526b298299b46b35595ced9055722df60c06ad6301f6a4e2c728a252
+ENV PYTHON_VERSION 3.13.9
+ENV PYTHON_SHA256 ed5ef34cda36cfa2f3a340f07cac7e7814f91c7f3c411f6d3562323a866c5c66
 
 RUN set -eux; \
 	\
@@ -301,8 +305,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ros-humble-ros-base=0.10.0-1* \
     && rm -rf /var/lib/apt/lists/*
 
-
-ENV DEBIAN_FRONTEND=noninteractive
 
 # curl dependencies
 RUN apt-get update \

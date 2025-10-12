@@ -2,7 +2,7 @@ services:
   ros-humble-docker:
     build:
       context: .
-    image: ubuntu22.04-node22.19.0-python3.13.7:bookworm-slim-uv-ros-humble
+    image: cuda12.9.1-node22.20.0-python3.13.9:bookworm-slim-uv-ros-humble
     container_name: ros-humble-docker
     tty: true
     ipc: host
