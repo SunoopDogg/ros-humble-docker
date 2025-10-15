@@ -1,22 +1,22 @@
 services:
-  kkalssam-python-template:
+  ros-humble-docker:
     build:
       context: .
-    image: node22.19.0-python3.13.7:trixie-slim-uv
-    container_name: kkalssam-python-template
+    image: ubuntu22.04-node22.19.0-python3.13.7:bookworm-slim-uv-ros-humble
+    container_name: ros-humble-docker
     tty: true
     ipc: host
     environment:
       - DISPLAY=${DISPLAY:-host.docker.internal:0}
       - QT_X11_NO_MITSHM=1
     volumes:
-      - .:/root/kkalssam-python-template
+      - .:/root/ros-humble-docker
       - /tmp/.X11-unix:/tmp/.X11-unix
 
-  kkalssam-python-template-gpu:
+  ros-humble-docker-gpu:
     extends:
-      service: kkalssam-python-template
-    container_name: kkalssam-python-template-gpu
+      service: ros-humble-docker
+    container_name: ros-humble-docker-gpu
     deploy:
       resources:
         reservations:
