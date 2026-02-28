@@ -18,7 +18,7 @@ services:
   ros-humble-docker-gpu:
     extends:
       service: ros-humble-docker
-    container_name: ros-humble-docker1-gpu
+    container_name: ros-humble-docker-gpu
     deploy:
       resources:
         reservations:
