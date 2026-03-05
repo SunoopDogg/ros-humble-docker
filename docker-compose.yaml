@@ -44,9 +44,11 @@ services:
     environment:
       - DISPLAY=${DISPLAY}
       - QT_X11_NO_MITSHM=1
+      - XAUTHORITY=/root/.Xauthority
     volumes:
       - .:/root/ros-humble-docker
       - /tmp/.X11-unix:/tmp/.X11-unix
       - /tmp/argus_socket:/tmp/argus_socket
+      - ~/.Xauthority:/root/.Xauthority
     profiles:
       - jetson
