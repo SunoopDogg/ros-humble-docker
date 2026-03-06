@@ -1,6 +1,13 @@
 #!/bin/bash
 set -e
 
+# Refresh expired ROS2 GPG key
+if command -v curl &> /dev/null; then
+    curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg
+else
+    apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys F42ED6FBAB17C654
+fi
+
 apt update
 
 # Core utilities
