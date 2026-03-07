@@ -1,4 +1,5 @@
-FROM nvidia/cuda:12.9.1-cudnn-devel-ubuntu22.04
+ARG BASE_IMAGE=nvidia/cuda:12.9.1-cudnn-devel-ubuntu22.04
+FROM ${BASE_IMAGE}
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -50,10 +51,38 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ros-humble-ros-base=0.10.0-1* \
     && rm -rf /var/lib/apt/lists/*
 
-# Common tools
-COPY docker/scripts/install-common.sh /tmp/install-common.sh
-RUN chmod +x /tmp/install-common.sh && /tmp/install-common.sh && rm /tmp/install-common.sh
 
+# Update package lists
+RUN apt update
+
+# Core utilities
+RUN apt install -y --no-install-recommends \
+        ca-certificates \
+        curl \
+        unzip
+
+# Git and Git LFS
+RUN apt install -y --no-install-recommends \
+        git \
+        git-lfs \
+    && git lfs install
+
+# GUI / Rendering libraries
+RUN apt install -y --no-install-recommends \
+        libgl1 \
+        libgtk2.0-dev \
+        tk
+
+# uv installation
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# nvm installation
+RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
 ENV NVM_DIR=/root/.nvm
+RUN . "$NVM_DIR/nvm.sh" 
+
+# Clean up
+RUN apt clean \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /root

@@ -1,9 +1,7 @@
 services:
   # ===== AMD64 =====
   ros-humble-docker:
-    build:
-      context: .
-      dockerfile: docker/Dockerfile.amd64
+    build: .
     image: cuda12.9.1:humble-uv-nvm
     container_name: ros-humble-docker
     privileged: true
@@ -20,7 +18,7 @@ services:
   ros-humble-docker-gpu:
     extends:
       service: ros-humble-docker
-    container_name: ros-humble-docker-gpu
+    container_name: ros-humble-docker1-gpu
     deploy:
       resources:
         reservations:
@@ -32,12 +30,12 @@ services:
       - gpu
 
   # ===== Jetson ARM64 =====
-  ros-humble-jetson:
+  ros-humble-docker-jetson:
     build:
-      context: .
-      dockerfile: docker/Dockerfile.jetson
-    image: l4t-r36.3.0:humble-uv-nvm
-    container_name: ros-humble-jetson
+      args:
+        BASE_IMAGE: dustynv/cudnn:8.9-r36.2.0
+    image: cudnn8.9-jetson:humble-uv-nvm
+    container_name: ros-humble-docker-jetson
     runtime: nvidia
     privileged: true
     tty: true
