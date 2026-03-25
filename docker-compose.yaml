@@ -1,19 +1,20 @@
 services:
   # ===== AMD64 =====
   ros-humble-docker:
-    build: .
     image: cuda12.9.1:humble-uv-nvm
+    build: .
     container_name: ros-humble-docker
-    privileged: true
-    tty: true
-    network_mode: host
-    ipc: host
+    working_dir: /root/ros-humble-docker
     environment:
       - DISPLAY=${DISPLAY:-host.docker.internal:0}
       - QT_X11_NO_MITSHM=1
     volumes:
       - .:/root/ros-humble-docker
       - /tmp/.X11-unix:/tmp/.X11-unix
+    network_mode: host
+    ipc: host
+    privileged: true
+    tty: true
 
   ros-humble-docker-gpu:
     extends:
@@ -36,11 +37,7 @@ services:
         BASE_IMAGE: dustynv/cudnn:8.9-r36.2.0
     image: cudnn8.9-jetson:humble-uv-nvm
     container_name: ros-humble-docker-jetson
-    runtime: nvidia
-    privileged: true
-    tty: true
-    network_mode: host
-    ipc: host
+    working_dir: /root/ros-humble-docker
     environment:
       - DISPLAY=${DISPLAY}
       - QT_X11_NO_MITSHM=1
@@ -50,5 +47,10 @@ services:
       - /tmp/.X11-unix:/tmp/.X11-unix
       - /tmp/argus_socket:/tmp/argus_socket
       - ~/.Xauthority:/root/.Xauthority
+    network_mode: host
+    ipc: host
+    privileged: true
+    runtime: nvidia
+    tty: true
     profiles:
       - jetson
