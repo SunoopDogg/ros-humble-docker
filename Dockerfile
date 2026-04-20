@@ -52,37 +52,24 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 
-# Update package lists
-RUN apt update
-
-# Core utilities
-RUN apt install -y --no-install-recommends \
+# System packages
+RUN apt update && apt install -y --no-install-recommends \
+        # Core utilities
         ca-certificates \
         curl \
-        unzip
-
-# Git and Git LFS
-RUN apt install -y --no-install-recommends \
+        unzip \
+        # Git
         git \
-        git-lfs \
-    && git lfs install
-
-# GUI / Rendering libraries
-RUN apt install -y --no-install-recommends \
+        # GUI / Rendering libraries
         libgl1 \
         libgtk2.0-dev \
-        tk
+        tk \
+    && rm -rf /var/lib/apt/lists/*
 
 # uv installation
 RUN curl -LsSf https://astral.sh/uv/install.sh | sh
 
 # nvm installation
-RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
 ENV NVM_DIR=/root/.nvm
-RUN . "$NVM_DIR/nvm.sh" 
-
-# Clean up
-RUN apt clean \
-    && rm -rf /var/lib/apt/lists/*
-
-WORKDIR /root
+RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash \
+    && . "$NVM_DIR/nvm.sh"

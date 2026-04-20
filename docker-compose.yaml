@@ -4,21 +4,20 @@ services:
     image: cuda12.9.1:humble-uv-nvm
     build: .
     container_name: ros-humble-docker
-    working_dir: /root/ros-humble-docker
-    environment:
-      - DISPLAY=${DISPLAY:-host.docker.internal:0}
-      - QT_X11_NO_MITSHM=1
     volumes:
       - .:/root/ros-humble-docker
       - /tmp/.X11-unix:/tmp/.X11-unix
+      - uv-cache:/root/.cache/uv
+    environment:
+      - DISPLAY=${DISPLAY:-host.docker.internal:0}
+      - QT_X11_NO_MITSHM=1
     network_mode: host
+    working_dir: /root/ros-humble-docker
     ipc: host
     privileged: true
     tty: true
 
   ros-humble-docker-gpu:
-    extends:
-      service: ros-humble-docker
     container_name: ros-humble-docker-gpu
     deploy:
       resources:
@@ -27,30 +26,36 @@ services:
             - driver: nvidia
               count: all
               capabilities: [gpu, utility, compute, graphics]
+    extends:
+      service: ros-humble-docker
     profiles:
       - gpu
 
   # ===== Jetson ARM64 =====
   ros-humble-docker-jetson:
+    image: cudnn8.9-jetson:humble-uv-nvm
     build:
       args:
         BASE_IMAGE: dustynv/cudnn:8.9-r36.2.0
-    image: cudnn8.9-jetson:humble-uv-nvm
     container_name: ros-humble-docker-jetson
-    working_dir: /root/ros-humble-docker
-    environment:
-      - DISPLAY=${DISPLAY}
-      - QT_X11_NO_MITSHM=1
-      - XAUTHORITY=/root/.Xauthority
     volumes:
       - .:/root/ros-humble-docker
       - /tmp/.X11-unix:/tmp/.X11-unix
       - /tmp/argus_socket:/tmp/argus_socket
       - ~/.Xauthority:/root/.Xauthority
+      - uv-cache:/root/.cache/uv
+    environment:
+      - DISPLAY=${DISPLAY}
+      - QT_X11_NO_MITSHM=1
+      - XAUTHORITY=/root/.Xauthority
     network_mode: host
+    working_dir: /root/ros-humble-docker
     ipc: host
     privileged: true
-    runtime: nvidia
-    tty: true
     profiles:
       - jetson
+    runtime: nvidia
+    tty: true
+
+volumes:
+  uv-cache:
