@@ -1,7 +1,7 @@
 services:
   # ===== AMD64 =====
   ros-humble-docker:
-    image: cuda12.9.1:humble-uv-nvm
+    image: cuda13.1.2:humble-uv-nvm
     build: .
     container_name: ros-humble-docker
     volumes:
